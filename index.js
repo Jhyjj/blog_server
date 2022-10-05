@@ -57,6 +57,35 @@ app.post("/create_post", async (req,res)=>{
         "insert into posts(`title`,`part`,`desc`,`img`) values(?,?,?,?)",
         [title,part,desc,img],
         (err,rows,fields)=>{
-            console.log(err);
+            res.send(rows);
         })
 } )
+
+
+//포스트 목록 불러오기
+app.get("/posts",async (req,res)=>{
+    connection.query("select * from posts",
+    (err,rows,fields)=>{
+        console.log(rows);
+        res.send(rows);
+    })
+})
+
+//특정포스트 하나만 불러오기
+app.get("/post/:no", async (req,res)=>{
+    const {no} = req.params;
+    connection.query(`select * from posts where no = '${no}'`,
+    (err,rows,fields)=>{
+        console.log(rows);
+        res.send(rows[0]);
+    })
+})
+
+//최근포스트 4개만 불러오기
+app.get("/postLatest",async (req,res)=>{
+    connection.query("select * from posts order by no desc limit 4",
+    (err,rows,fields)=>{
+        console.log(rows);
+        res.send(rows);
+    })
+})
