@@ -62,9 +62,11 @@ app.post("/create_post", async (req,res)=>{
 } )
 
 
-//포스트 목록 불러오기
-app.get("/posts",async (req,res)=>{
-    connection.query("select * from posts",
+//포스트 목록 불러오기 -> 최신글부터로 변경
+app.get("/posts/:list",async (req,res)=>{
+    const {list} = req.params;
+    console.log(list);
+    connection.query(list==="전체보기"? `select * from posts order by no desc` : `select * from posts where part ='${list}' order by no desc `,
     (err,rows,fields)=>{
         console.log(rows);
         res.send(rows);
@@ -87,5 +89,28 @@ app.get("/postLatest",async (req,res)=>{
     (err,rows,fields)=>{
         console.log(rows);
         res.send(rows);
+    })
+})
+
+//포스트 삭제 쿼리
+app.post("/delete/:no", async (req,res)=>{
+    const {no} = req.params;
+    connection.query(`delete from posts where no = '${no}'`,
+    (err,rows,fields)=>{
+        console.log(err);
+        res.send("포스트 삭제 완료")
+    })
+})
+
+
+//포스트 수정하기
+app.post("/update_post/:no", async (req,res)=>{
+    const {no} = req.params;
+    const {title,part,desc,img} = req.body;
+    connection.query('update posts set `title`=?, `part`=?, `desc`=? where `no` =?',
+    [title,part,desc,no],
+    (err,rows,fields)=>{
+        console.log(err);
+        res.send("포스트 수정 완료")
     })
 })
