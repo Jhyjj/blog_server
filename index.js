@@ -62,13 +62,22 @@ app.post("/create_post", async (req,res)=>{
 } )
 
 
-//포스트 목록 불러오기 -> 최신글부터로 변경
-app.get("/posts/:list",async (req,res)=>{
-    const {list} = req.params;
-    console.log(list);
-    connection.query(list==="전체보기"? `select * from posts order by no desc` : `select * from posts where part ='${list}' order by no desc `,
+app.post("/posts", async (req,res)=>{
+    connection.query("select * from posts order by no desc",
     (err,rows,fields)=>{
-        console.log(rows);
+        res.send(rows);
+    })
+})
+
+
+//포스트 목록 불러오기 -> 최신글부터로 변경 -> 페이지네이션
+app.post("/posts/:list",async (req,res)=>{
+    const {list} = req.params;
+    const {pageNum} = req.body;
+    console.log(pageNum);
+    console.log(list);
+    connection.query(list==="전체보기"? `select * from posts order by no desc limit ${(pageNum-1)*10},10` : `select * from posts where part ='${list}' order by no desc `,
+    (err,rows,fields)=>{
         res.send(rows);
     })
 })
